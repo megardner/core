@@ -1,6 +1,7 @@
 """Support for Flux lights."""
 import logging
 import random
+import time
 
 from flux_led import BulbScanner, WifiLedBulb
 import voluptuous as vol
@@ -351,10 +352,18 @@ class FluxLight(LightEntity):
         # handle RGB mode
         else:
             self._bulb.setRgb(*tuple(rgb), brightness=brightness)
+            
+        # Update the state to avoid looking like the switch hasn't worked.
+        time.sleep(1)
+        self._bulb.update_state(retry=2)
 
     def turn_off(self, **kwargs):
         """Turn the specified or all lights off."""
         self._bulb.turnOff()
+        
+        # Update the state to avoid looking like the switch hasn't worked.
+        time.sleep(1)
+        self._bulb.update_state(retry=2)
 
     def update(self):
         """Synchronize state with bulb."""
